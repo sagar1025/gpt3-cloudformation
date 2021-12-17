@@ -65,6 +65,10 @@ export default function Home() {
             ?
             <>
               <pre>
+              AWSTemplateFormatVersion: '2010-09-09'{'\n'}
+              Metadata:{'\n'}
+              {'  '}License: Apache-2.0
+              {'\n'}
                 {template}
               </pre>
             </>
