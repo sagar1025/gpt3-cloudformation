@@ -7,6 +7,7 @@ import ReactLoading from 'react-loading';
 export default function Home() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+  const [template, setTemplate] = useState('');
 
   const Loader = () => (
     <ReactLoading type='bars' color='#00aaff' height={275} width={275} />
@@ -16,9 +17,9 @@ export default function Home() {
     try {
       event.preventDefault();
       setLoading(true);
-      const res = await fetch('/api/hello', {
+      const res = await fetch('/api/getCFTemplate', {
         body: JSON.stringify({
-          description: description
+          description: 'Create a ' + description
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -27,7 +28,10 @@ export default function Home() {
       });
   
       const result = await res.json();
-      console.log(result)
+      //console.log(result);
+      if(result && result.template && result.template.length > 0) {
+        setTemplate(result.template);
+      }
       setLoading(false);
     }
     catch(e){
@@ -47,12 +51,26 @@ export default function Home() {
         <div className={styles.formWrapper}>
           <form onSubmit={generateTemplate} method='POST'>
             <label htmlFor="description" className={styles.label} >Enter the AWS resources you would like to create:</label>
-            <input id="description" name="description" type="text" autoComplete="name" required className={styles.searchbar} onChange={(e) => { setDescription(e.target.value); }} />
+            <p>Be specific about the instance types and other custom specifications you would like. Examples: </p>
+            <p>Create a new RDS with AuroraDB of size 2GB</p>
+            <p>Create a static website hosted on S3 and served on Amazon CloudFront</p>
+            <span>Create a </span><input id="description" name="description" type="text" autoComplete="name" required className={styles.searchbar} onChange={(e) => { setDescription(e.target.value); }} />
             <button type="submit" className={styles.btn}>Generate</button>
           </form>
         </div>
 
         <div className={styles.result}>
+          {
+            template.length > 0 
+            ?
+            <>
+              <pre>
+                {template}
+              </pre>
+            </>
+            :
+            <></>
+          }
         </div>
       </div>
       }

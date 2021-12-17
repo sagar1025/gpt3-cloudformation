@@ -7,7 +7,7 @@ export const siteTitle = 'AWS CloudFormation template generator'
 
 export default function Layout({ children, home }) {
   return (
-    <div>
+    <>
       <Head>
         <link rel="icon" href="/favicon.ico" />
         <meta
@@ -24,20 +24,7 @@ export default function Layout({ children, home }) {
       </header>
       <main className={styles.containerHome}>
         {children}
-
-        <footer className={styles.footer}>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Powered by{' '}
-            <span className={styles.logo}>
-              <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-            </span>
-          </a>
-        </footer>
       </main>
-    </div>
+    </>
   )
 }

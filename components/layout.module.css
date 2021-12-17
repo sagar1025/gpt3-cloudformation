@@ -1,3 +1,7 @@
+.bodyWrapper {
+  position: relative;
+}
+
 .container {
     max-width: 1300px;
     margin: 0 auto;
@@ -15,21 +19,4 @@
 
 .backToHome {
   margin: 3rem 0 0;
-}
-
-.footer {
-  width: 100%;
-  border-top: 1px solid #eaeaea;
-  height: 75px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-}
-
-.footer a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
