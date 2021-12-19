@@ -3,7 +3,6 @@ import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import ReactLoading from 'react-loading';
 
-
 export default function Home() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -11,7 +10,7 @@ export default function Home() {
 
   const Loader = () => (
     <ReactLoading type='bars' color='#00aaff' height={275} width={275} />
-);
+  );
 
   const generateTemplate = async event => {
     try {
@@ -28,8 +27,7 @@ export default function Home() {
       });
   
       const result = await res.json();
-      //console.log(result);
-      if(result && result.template && result.template.length > 0) {
+      if (result && result.template && result.template.length > 0 && result.template !== 'Error') {
         setTemplate(result.template);
       }
       setLoading(false);
@@ -65,10 +63,6 @@ export default function Home() {
             ?
             <>
               <pre>
-              AWSTemplateFormatVersion: '2010-09-09'{'\n'}
-              Metadata:{'\n'}
-              {'  '}License: Apache-2.0
-              {'\n'}
                 {template}
               </pre>
             </>
