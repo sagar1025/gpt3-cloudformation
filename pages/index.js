@@ -18,7 +18,7 @@ export default function Home() {
   const generateTemplate = async event => {
     event.preventDefault();
     setTemplate(['']);
-    const events = new EventSource('http://localhost:3000/api?description='+ description);
+    const events = new EventSource('/api?description='+ encodeURIComponent(description));
     events.onmessage = (result) => {
       try {
         if (result && result.data && result.data.length > 0 && result.data !== '"""') {
