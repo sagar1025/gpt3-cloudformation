@@ -20,7 +20,7 @@ export default function Home() {
     event.preventDefault();
     setTemplate(['']);
     
-    const events = new EventSource('/api?description='+ encodeURIComponent(description));
+    const events = new EventSource(`${window.location.href + 'api?description='}`+ encodeURIComponent(description));
     events.onmessage = (result) => {
       setLoading(false);
       try {
