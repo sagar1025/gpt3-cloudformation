@@ -1,5 +1,8 @@
+var compression = require('compression');
+
 const app = require('express')();
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+app.use(compression())
 
 const maxTokens = 1300;
 
@@ -8,6 +11,7 @@ app.get('/api', async (request, response) => {
     response.setHeader('Connection', 'keep-alive');
     response.setHeader('Cache-Control', 'no-cache');
     response.flushHeaders();
+    response.status(200);
 
     let prompt = `"""\n# YAML\n# Write a CloudFormation template to create an ${decodeURIComponent(request.query.description)}\n# Use this documentation as a guide\n# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-guide.html\n\nAWSTemplateFormatVersion: '2010-09-09'\nMetadata:\n  License: Apache-2.0\nDescription: ${decodeURIComponent(request.query.description)}\n`;
     

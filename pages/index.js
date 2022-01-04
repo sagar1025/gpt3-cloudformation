@@ -16,22 +16,25 @@ export default function Home() {
   );
 
   const generateTemplate = async event => {
+    setLoading(true);
     event.preventDefault();
     setTemplate(['']);
+    
     const events = new EventSource('/api?description='+ encodeURIComponent(description));
     events.onmessage = (result) => {
+      setLoading(false);
       try {
         if (result && result.data && result.data.length > 0 && result.data !== '"""') {
-          console.log(result.data);
           if (result.data.includes('[DONE]')) {
             events.end();
+            setLoading(false);
           }
           else {
             setTemplate(template => [...template, result.data]);
           }
         }
       }
-      catch(e){events.close();}
+      catch(e){events.close();setLoading(false);}
     };
   }
   
