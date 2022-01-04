@@ -2,43 +2,39 @@ import Layout from '../components/layout'
 import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import ReactLoading from 'react-loading';
+import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
 
+const EventSource = NativeEventSource || EventSourcePolyfill;
 
 export default function Home() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
-  const [template, setTemplate] = useState('');
+  const [template, setTemplate] = useState(['']);
 
   const Loader = () => (
     <ReactLoading type='bars' color='#00aaff' height={275} width={275} />
-);
+  );
 
   const generateTemplate = async event => {
-    try {
-      event.preventDefault();
-      setLoading(true);
-      const res = await fetch('/api/getCFTemplate', {
-        body: JSON.stringify({
-          description: 'Create a ' + description
-        }),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'POST'
-      });
-  
-      const result = await res.json();
-      //console.log(result);
-      if(result && result.template && result.template.length > 0) {
-        setTemplate(result.template);
+    event.preventDefault();
+    setTemplate(['']);
+    const events = new EventSource('http://localhost:3000/api?description='+ description);
+    events.onmessage = (result) => {
+      try {
+        if (result && result.data && result.data.length > 0 && result.data !== '"""') {
+          console.log(result.data);
+          if (result.data.includes('[DONE]')) {
+            events.end();
+          }
+          else {
+            setTemplate(template => [...template, result.data]);
+          }
+        }
       }
-      setLoading(false);
-    }
-    catch(e){
-      setLoading(false);
-    }
-
+      catch(e){events.close();}
+    };
   }
+  
 
 
   return (
@@ -61,11 +57,11 @@ export default function Home() {
 
         <div className={styles.result}>
           {
-            template.length > 0 
+            template && template.length > 0 
             ?
             <>
               <pre>
-                {template}
+                {template.join('\n')}
               </pre>
             </>
             :

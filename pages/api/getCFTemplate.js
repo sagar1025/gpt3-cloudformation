@@ -16,27 +16,51 @@ export default async function handler(req, res) {
     //       }
     //   ]
     // }
-    
-    const gptRes = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
-      body: JSON.stringify({
-        "prompt": `# YAML\n# Write a CloudFormation template to create an ${req.body.description}\n# Use this documentation as a guide\n# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-guide.html\n\nAWSTemplateFormatVersion: '2010-09-09'\nMetadata:\n  License: Apache-2.0\nDescription: ${req.body.description}\n`,
-        "temperature": 0,
-        "max_tokens": 3000,
-        "top_p": 1,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "stop": ["\"\"\""]
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPEN_AI_KEY}`
-      },
-      method: 'POST'
-    });
-    const result = await gptRes.json();
+
+
+    let p = `"""\n# YAML\n# Write a CloudFormation template to create an ${req.body.description}\n# Use this documentation as a guide\n# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-guide.html\n\nAWSTemplateFormatVersion: '2010-09-09'\nMetadata:\n  License: Apache-2.0\nDescription: ${req.body.description}\n`;
+    let stop = false;
+    let result = {};
+    let gptRes = {};
+    const maxTokens = 80;
+    let c = Math.floor(maxTokens / 10);//max retry
+    while (!stop) {
+      if (c === 0) {
+        break;
+      }
+      c = c - 1;
+      gptRes = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+        body: JSON.stringify({
+          "prompt": p,
+          "temperature": 0,
+          "max_tokens": maxTokens,
+          "top_p": 1,
+          "echo": true,
+          "frequency_penalty": 0,
+          "presence_penalty": 0,
+          "stop": ["\"\"\""]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPEN_AI_KEY}`
+        },
+        method: 'POST'
+      });
+      result = await gptRes.json();
+
+      if (result && result.choices && result.choices.length > 0) {
+        if(result.choices[0].finish_reason && result.choices[0].finish_reason === 'length' && result.choices[0].text && result.choices[0].text.length > 0) {
+          p = result.choices[0].text;//update prompt
+        }
+        else {
+          stop = true;
+        }
+      }
+    }
+
     if (result && result.choices && result.choices.length > 0 && result.choices[0].text) {
-      console.log(result.choices[0].text.split('\'\'\'')[0])
-      res.status(200).json({ template: result.choices[0].text.split('\'\'\'')[0] });
+      //console.log(result.choices[0].text.split('\'\'\'')[0])
+      res.status(200).json({ template: result.choices[0].text.split('\n\n')[1] });
       return;
     }
     res.status(200).json({ template: 'Error' });
