@@ -48,7 +48,7 @@ app.get('/api', async (request, response) => {
 });
 
 const getData = async (p) => {
-    const apiCall = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+    const apiCall = await fetch('https://api.openai.com/v1/engines/cushman-codex/completions', {
         body: JSON.stringify({
             "prompt": p,
             "temperature": 0,

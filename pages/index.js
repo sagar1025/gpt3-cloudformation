@@ -16,7 +16,7 @@ export default function Home() {
   );
 
   const generateTemplate = async event => {
-    setLoading(true);
+    //setLoading(true);
     event.preventDefault();
     setTemplate(['']);
     
